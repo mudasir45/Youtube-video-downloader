@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Downloader</title>
+</head>
+<body>
+    <!-- youtube_downloader/templates/download_form.html -->
+    <form id="download-form" method="post" action="{% url 'download_youtube_video' %}">
+        {% csrf_token %}
+        <label for="video_url">YouTube Video URL:</label>
+        <input type="text" name="video_url">
+        <button type="submit">Download</button>
+    </form>
+
+    <div id="response-message" style="display: none;"></div>
+
+    <script>
+        const form = document.getElementById('download-form');
+        const responseMessage = document.getElementById('response-message');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                responseMessage.textContent = responseData.message || 'Video downloaded successfully.';
+                responseMessage.style.color = 'green';
+            } else {
+                responseMessage.textContent = responseData.error || 'An error occurred while downloading the video.';
+                responseMessage.style.color = 'red';
+            }
+
+            responseMessage.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
